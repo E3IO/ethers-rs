@@ -86,6 +86,7 @@ solc-tests = ["ethers-solc?/tests"]
 # Deprecated
 abigen-offline = ["abigen"]
 eip712 = []
+eip1559 = ["ethers-core/eip1559"]
 ethers-solc = ["solc"]
 solc-sha2-asm = []
 
