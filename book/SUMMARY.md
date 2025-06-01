@@ -58,7 +58,7 @@
   - [Create raw transaction]()
   - [Create typed transaction]()
   - [Decode input]()
-  - [EIP-1559]()
+  - [EIP-1559](./transactions/eip1559.md)
   - [ENS]()
   - [Estimate gas]()
   - [Get gas price]()

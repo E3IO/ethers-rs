@@ -1,7 +1,9 @@
 #[cfg(not(feature = "celo"))]
 mod eth_tests {
     use crate::spawn_anvil;
-    use ethers_core::types::{Address, BlockId, BlockNumber, TransactionRequest, H256};
+    use ethers_core::types::{
+        Address, BlockId, BlockNumber, Eip1559TransactionRequest, TransactionRequest, H256, U256,
+    };
     use ethers_providers::{Middleware, StreamExt, GOERLI};
 
     #[tokio::test]
@@ -121,6 +123,45 @@ mod eth_tests {
         let tx_hash = *pending_tx;
         let receipt = pending_tx.confirmations(3).await.unwrap().unwrap();
         assert_eq!(receipt.transaction_hash, tx_hash);
+    }
+
+    #[tokio::test]
+    async fn eip1559_send_transaction() {
+        let (provider, anvil) = spawn_anvil();
+        let from = anvil.addresses()[0];
+        let to = anvil.addresses()[1];
+
+        // EIP-1559 specific values
+        let max_fee_per_gas = U256::from(1_000_000_000); // 1 gwei
+        let max_priority_fee_per_gas = U256::from(500_000_000); // 0.5 gwei
+
+        let tx = Eip1559TransactionRequest::new()
+            .to(to)
+            .from(from)
+            .value(U256::from(10000)) // send 10000 wei
+            .max_fee_per_gas(max_fee_per_gas)
+            .max_priority_fee_per_gas(max_priority_fee_per_gas);
+
+        // Send the transaction
+        let pending_tx = provider.send_transaction(tx.clone(), None).await.unwrap();
+        let tx_hash = *pending_tx;
+
+        // Wait for the transaction to be mined
+        let receipt = pending_tx.confirmations(1).await.unwrap().unwrap();
+        assert_eq!(receipt.transaction_hash, tx_hash);
+        assert_eq!(receipt.from, from);
+        assert_eq!(receipt.to, Some(to));
+
+        // Fetch the transaction from the node
+        let tx_from_node = provider.get_transaction(tx_hash).await.unwrap().unwrap();
+
+        // Assert EIP-1559 fields
+        assert_eq!(tx_from_node.max_fee_per_gas, Some(max_fee_per_gas));
+        assert_eq!(
+            tx_from_node.max_priority_fee_per_gas,
+            Some(max_priority_fee_per_gas)
+        );
+        assert_eq!(tx_from_node.transaction_type, Some(2.into())); // EIP-1559 is type 2
     }
 }
 

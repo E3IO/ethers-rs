@@ -17,3 +17,7 @@ serde.workspace = true
 serde_json.workspace = true
 
 eyre.workspace = true
+
+[[example]]
+name = "eip1559_transaction"
+path = "examples/eip1559_transaction.rs"
