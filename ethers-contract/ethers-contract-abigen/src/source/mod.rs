@@ -119,7 +119,7 @@ impl Source {
             } else {
                 eyre::eyre!("File does not exist: {path}")
             };
-            return Err(err)
+            return Err(err);
         }
 
         Ok(Source::Local(resolved))

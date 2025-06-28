@@ -336,7 +336,7 @@ impl Client {
                 return match src {
                     Some(src) => Ok(src),
                     None => Err(EtherscanError::ContractCodeNotVerified(address)),
-                }
+                };
             }
         }
 
@@ -347,26 +347,26 @@ impl Client {
             Some(result) => result,
             None => {
                 if resp.message.contains("Contract source code not verified") {
-                    return Err(EtherscanError::ContractCodeNotVerified(address))
+                    return Err(EtherscanError::ContractCodeNotVerified(address));
                 }
                 return Err(EtherscanError::EmptyResult {
                     message: resp.message,
                     status: resp.status,
-                })
+                });
             }
         };
 
         if result.starts_with("Max rate limit reached") {
-            return Err(EtherscanError::RateLimitExceeded)
+            return Err(EtherscanError::RateLimitExceeded);
         }
 
-        if result.starts_with("Contract source code not verified") ||
-            resp.message.starts_with("Contract source code not verified")
+        if result.starts_with("Contract source code not verified")
+            || resp.message.starts_with("Contract source code not verified")
         {
             if let Some(ref cache) = self.cache {
                 cache.set_abi(address, None);
             }
-            return Err(EtherscanError::ContractCodeNotVerified(address))
+            return Err(EtherscanError::ContractCodeNotVerified(address));
         }
         let abi = serde_json::from_str(&result)?;
 
@@ -397,7 +397,7 @@ impl Client {
                 return match src {
                     Some(src) => Ok(src),
                     None => Err(EtherscanError::ContractCodeNotVerified(address)),
-                }
+                };
             }
         }
 
@@ -410,7 +410,7 @@ impl Client {
             if let Some(ref cache) = self.cache {
                 cache.set_source(address, None);
             }
-            return Err(EtherscanError::ContractCodeNotVerified(address))
+            return Err(EtherscanError::ContractCodeNotVerified(address));
         }
 
         let response: Response<ContractMetadata> = self.sanitize_response(response)?;

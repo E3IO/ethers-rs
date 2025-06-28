@@ -299,7 +299,7 @@ where
                 .inner
                 .send_transaction(tx, block)
                 .await
-                .map_err(SignerMiddlewareError::MiddlewareError)
+                .map_err(SignerMiddlewareError::MiddlewareError);
         }
 
         // if we have a nonce manager set, we should try handling the result in

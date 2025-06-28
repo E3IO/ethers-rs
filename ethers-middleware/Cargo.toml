@@ -62,6 +62,9 @@ reqwest = { workspace = true, features = ["json", "rustls"] }
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
 tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time"] }
 
+[build-dependencies]
+cfg_aliases = "0.1.1"
+
 [features]
 default = ["rustls", "etherscan"]
 celo = ["ethers-core/celo", "ethers-providers/celo", "ethers-signers/celo", "ethers-contract/celo"]

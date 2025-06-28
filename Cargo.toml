@@ -81,17 +81,17 @@ ethers-contract-abigen = { version = "2.0.14", path = "ethers-contract/ethers-co
 ethers-contract-derive = { version = "2.0.14", path = "ethers-contract/ethers-contract-derive", default-features = false }
 
 # async / async utils
-tokio = "1.32"
-tokio-tungstenite = { version = "0.20", default-features = false }
-futures-core = "0.3.28"
-futures-util = "0.3.28"
-futures-executor = "0.3.28"
-futures-channel = "0.3.28"
+tokio = "1.35"
+tokio-tungstenite = { version = "0.21", default-features = false }
+futures-core = "0.3.30"
+futures-util = "0.3.30"
+futures-executor = "0.3.30"
+futures-channel = "0.3.30"
 futures-locks = { version = "0.7.1", default-features = false }
 futures-timer = { version = "3.0.2", default-features = false, features = ["wasm-bindgen"] }
 pin-project = "1.1"
-reqwest = { version = "0.11.19", default-features = false }
-url = { version = "2.2.2", default-features = false }
+reqwest = { version = "0.11.23", default-features = false }
+url = { version = "2.5.0", default-features = false }
 
 # crypto
 elliptic-curve = { version = "0.13.5", default-features = false }

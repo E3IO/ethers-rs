@@ -97,7 +97,7 @@ where
             if let Some(tx) = this.buffered.pop_front() {
                 this.push_tx(tx);
             } else {
-                break
+                break;
             }
         }
 
@@ -113,7 +113,7 @@ where
                     }
                     Poll::Ready(None) => {
                         this.stream_done = true;
-                        break
+                        break;
                     }
                     _ => break,
                 }
@@ -122,12 +122,12 @@ where
 
         // poll running futures
         if let tx @ Poll::Ready(Some(_)) = this.pending.poll_next_unpin(cx) {
-            return tx
+            return tx;
         }
 
         if this.stream_done && this.pending.is_empty() {
             // all done
-            return Poll::Ready(None)
+            return Poll::Ready(None);
         }
 
         Poll::Pending
@@ -229,7 +229,7 @@ mod tests {
                         sent.iter().map(|tx| tx.transaction_hash).collect::<HashSet<_>>();
                     assert_eq!(sent_txs, watch_received.iter().map(|tx| tx.hash).collect());
                     assert_eq!(sent_txs, sub_received.iter().map(|tx| tx.hash).collect());
-                    break
+                    break;
                 }
             }
         }

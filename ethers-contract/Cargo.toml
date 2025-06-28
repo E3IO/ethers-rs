@@ -44,6 +44,9 @@ ethers-providers = { workspace = true, features = ["ws"] }
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 
+[build-dependencies]
+cfg_aliases = "0.1.1"
+
 [features]
 default = ["abigen", "providers"]
 

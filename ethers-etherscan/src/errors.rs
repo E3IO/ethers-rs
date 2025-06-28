@@ -65,8 +65,8 @@ pub(crate) fn is_blocked_by_cloudflare_response(txt: &str) -> bool {
 /// etherscan/polyscan is protected by cloudflare, which can require captchas to "review the
 /// security of your connection before proceeding"
 pub(crate) fn is_cloudflare_security_challenge(txt: &str) -> bool {
-    txt.contains("https://www.cloudflare.com?utm_source=challenge") ||
-        txt.to_lowercase().contains("checking if the site connection is secure")
+    txt.contains("https://www.cloudflare.com?utm_source=challenge")
+        || txt.to_lowercase().contains("checking if the site connection is secure")
 }
 
 /// Some endpoints prompt a security challenge, which is most likely a captcha that requires javascript: <https://github.com/foundry-rs/foundry/issues/4865#issuecomment-1752876830>

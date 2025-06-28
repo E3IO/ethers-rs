@@ -65,7 +65,7 @@ impl<'de> Deserialize<'de> for PubSubItem {
                     match key {
                         "jsonrpc" => {
                             if jsonrpc {
-                                return Err(de::Error::duplicate_field("jsonrpc"))
+                                return Err(de::Error::duplicate_field("jsonrpc"));
                             }
 
                             let value = map.next_value()?;
@@ -73,14 +73,14 @@ impl<'de> Deserialize<'de> for PubSubItem {
                                 return Err(de::Error::invalid_value(
                                     de::Unexpected::Str(value),
                                     &"2.0",
-                                ))
+                                ));
                             }
 
                             jsonrpc = true;
                         }
                         "id" => {
                             if id.is_some() {
-                                return Err(de::Error::duplicate_field("id"))
+                                return Err(de::Error::duplicate_field("id"));
                             }
 
                             let value: u64 = map.next_value()?;
@@ -88,7 +88,7 @@ impl<'de> Deserialize<'de> for PubSubItem {
                         }
                         "result" => {
                             if result.is_some() {
-                                return Err(de::Error::duplicate_field("result"))
+                                return Err(de::Error::duplicate_field("result"));
                             }
 
                             let value: Box<RawValue> = map.next_value()?;
@@ -96,7 +96,7 @@ impl<'de> Deserialize<'de> for PubSubItem {
                         }
                         "error" => {
                             if error.is_some() {
-                                return Err(de::Error::duplicate_field("error"))
+                                return Err(de::Error::duplicate_field("error"));
                             }
 
                             let value: JsonRpcError = map.next_value()?;
@@ -104,7 +104,7 @@ impl<'de> Deserialize<'de> for PubSubItem {
                         }
                         "method" => {
                             if method.is_some() {
-                                return Err(de::Error::duplicate_field("method"))
+                                return Err(de::Error::duplicate_field("method"));
                             }
 
                             let value: String = map.next_value()?;
@@ -112,7 +112,7 @@ impl<'de> Deserialize<'de> for PubSubItem {
                         }
                         "params" => {
                             if params.is_some() {
-                                return Err(de::Error::duplicate_field("params"))
+                                return Err(de::Error::duplicate_field("params"));
                             }
 
                             let value: Notification = map.next_value()?;
@@ -129,7 +129,7 @@ impl<'de> Deserialize<'de> for PubSubItem {
 
                 // jsonrpc version must be present in all responses
                 if !jsonrpc {
-                    return Err(de::Error::missing_field("jsonrpc"))
+                    return Err(de::Error::missing_field("jsonrpc"));
                 }
 
                 match (id, result, error, method, params) {
@@ -267,8 +267,6 @@ mod aliases {
     pub type WsError = tungstenite::Error;
     pub type WsStreamItem = Result<Message, WsError>;
 
-    pub use http::Request as HttpRequest;
-
     pub use tungstenite::client::IntoClientRequest;
 
     pub type InternalStream =
@@ -278,15 +276,41 @@ mod aliases {
         fn into_client_request(
             self,
         ) -> tungstenite::Result<tungstenite::handshake::client::Request> {
-            let mut request: HttpRequest<()> = self.url.into_client_request()?;
+            let request = self.url.into_client_request()?;
             if let Some(auth) = self.auth {
-                let mut auth_value = http::HeaderValue::from_str(&auth.to_string())?;
+                let mut auth_value =
+                    match tungstenite::http::HeaderValue::from_str(&auth.to_string()) {
+                        Ok(val) => val,
+                        Err(e) => {
+                            return Err(tungstenite::Error::Http(
+                                tungstenite::http::Response::builder()
+                                    .status(400)
+                                    .body(Some(format!("Invalid auth header: {}", e).into_bytes()))
+                                    .unwrap(),
+                            ))
+                        }
+                    };
                 auth_value.set_sensitive(true);
 
-                request.headers_mut().insert(http::header::AUTHORIZATION, auth_value);
-            }
+                let mut headers = request.headers().clone();
+                headers.insert(tungstenite::http::header::AUTHORIZATION, auth_value);
 
-            request.into_client_request()
+                tungstenite::http::Request::builder()
+                    .uri(request.uri())
+                    .method(request.method())
+                    .version(request.version())
+                    .body(request.into_body())
+                    .map_err(|e| {
+                        tungstenite::Error::Http(
+                            tungstenite::http::Response::builder()
+                                .status(500)
+                                .body(Some(format!("Failed to build request: {}", e).into_bytes()))
+                                .unwrap(),
+                        )
+                    })
+            } else {
+                Ok(request)
+            }
         }
     }
 }

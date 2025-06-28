@@ -89,6 +89,16 @@
 #![cfg_attr(docsrs, feature(doc_cfg, doc_auto_cfg))]
 #![doc(test(no_crate_inject, attr(deny(rust_2018_idioms), allow(dead_code, unused_variables))))]
 
+// 编译时检查互斥特性
+#[cfg(all(feature = "celo", feature = "optimism"))]
+compile_error!("features 'celo' and 'optimism' are mutually exclusive");
+
+#[cfg(all(feature = "rustls", feature = "openssl"))]
+compile_error!("features 'rustls' and 'openssl' are mutually exclusive");
+
+#[cfg(all(feature = "ws", feature = "legacy-ws"))]
+compile_error!("features 'ws' and 'legacy-ws' are mutually exclusive");
+
 #[doc(inline)]
 pub use ethers_addressbook as addressbook;
 #[doc(inline)]
@@ -114,7 +124,21 @@ pub use ethers_solc as solc;
 pub use ethers_core::{abi, types, utils};
 
 /// Easy imports of frequently used type definitions and traits.
-#[doc(hidden)]
+///
+/// This module provides a convenient way to import all commonly used types and traits
+/// from the ethers ecosystem. It's designed to simplify the import process for users
+/// who want to quickly start working with Ethereum.
+///
+/// # Example
+///
+/// ```rust
+/// use ethers::prelude::*;
+///
+/// // Now you have access to all commonly used types and traits
+/// let provider = Provider::<Http>::try_from("https://eth.llamarpc.com")?;
+/// let wallet = LocalWallet::new(&mut rand::thread_rng());
+/// # Ok::<(), Box<dyn std::error::Error>>(())
+/// ```
 #[allow(unknown_lints, ambiguous_glob_reexports)]
 pub mod prelude {
     pub use super::addressbook::contract;

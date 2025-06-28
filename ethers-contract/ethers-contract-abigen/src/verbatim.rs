@@ -66,7 +66,7 @@ impl<T: Verbatim> Verbatim for Vec<T> {
 impl<K: Verbatim, V: Verbatim> Verbatim for BTreeMap<K, V> {
     fn to_tokens(&self, s: &mut TokenStream, ethers_core: &Path) {
         if self.is_empty() {
-            return s.extend(quote!(::std::collections::BTreeMap::new()))
+            return s.extend(quote!(::std::collections::BTreeMap::new()));
         }
 
         let iter = self.iter().map(|(k, v)| {

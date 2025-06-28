@@ -70,7 +70,10 @@ tracing-subscriber.workspace = true
 
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
 yubihsm = { version = "0.42", features = ["secp256k1", "usb", "mockhsm"] }
-tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time"] }
+
+[build-dependencies]
+cfg_aliases = "0.1.1"
 
 [features]
 futures = ["futures-util", "futures-executor"]
@@ -82,3 +85,5 @@ ledger = ["coins-ledger", "futures", "semver"]
 trezor = ["trezor-client", "futures", "semver", "home"]
 aws = ["rusoto_core/rustls", "rusoto_kms/rustls", "spki"]
 yubi = ["yubihsm"]
+
+default = []

@@ -335,13 +335,13 @@ impl SolFilesCache {
             if entry.artifacts.is_empty() {
                 // keep entries that didn't emit any artifacts in the first place, such as a
                 // solidity file that only includes error definitions
-                return true
+                return true;
             }
 
             if let Some(versions) = files.remove(file.as_path()) {
                 entry.retain_versions(versions);
             } else {
-                return false
+                return false;
             }
             !entry.artifacts.is_empty()
         });
@@ -741,9 +741,10 @@ impl<'a, T: ArtifactOutput> ArtifactsCacheInner<'a, T> {
             }
             None => {
                 // `check_imports` avoids infinite recursion
-                let dirty = self.is_dirty_impl(file, version) ||
-                    (check_imports &&
-                        self.edges
+                let dirty = self.is_dirty_impl(file, version)
+                    || (check_imports
+                        && self
+                            .edges
                             .imports(file)
                             .iter()
                             .any(|file| self.is_dirty(file, version, memo, false)));
@@ -756,22 +757,22 @@ impl<'a, T: ArtifactOutput> ArtifactsCacheInner<'a, T> {
     fn is_dirty_impl(&self, file: &Path, version: &Version) -> bool {
         let Some(hash) = self.content_hashes.get(file) else {
             tracing::trace!("missing cache entry");
-            return true
+            return true;
         };
 
         let Some(entry) = self.cache.entry(file) else {
             tracing::trace!("missing content hash");
-            return true
+            return true;
         };
 
         if entry.content_hash != *hash {
             tracing::trace!("content hash changed");
-            return true
+            return true;
         }
 
         if self.project.solc_config != entry.solc_config {
             tracing::trace!("solc config changed");
-            return true
+            return true;
         }
 
         // only check artifact's existence if the file generated artifacts.
@@ -779,12 +780,12 @@ impl<'a, T: ArtifactOutput> ArtifactsCacheInner<'a, T> {
         // re-export) do not create artifacts
         if entry.artifacts.is_empty() {
             tracing::trace!("no artifacts");
-            return false
+            return false;
         }
 
         if !entry.contains_version(version) {
             tracing::trace!("missing linked artifacts",);
-            return true
+            return true;
         }
 
         if entry.artifacts_for_version(version).any(|artifact_path| {
@@ -794,7 +795,7 @@ impl<'a, T: ArtifactOutput> ArtifactsCacheInner<'a, T> {
             }
             missing_artifact
         }) {
-            return true
+            return true;
         }
 
         // all things match, can be reused
@@ -837,7 +838,7 @@ impl<'a, T: ArtifactOutput> ArtifactsCache<'a, T> {
                 if let Ok(cache) = SolFilesCache::read_joined(&project.paths) {
                     if cache.paths == paths {
                         // unchanged project paths
-                        return cache
+                        return cache;
                     }
                 }
             }

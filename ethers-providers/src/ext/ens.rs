@@ -77,7 +77,7 @@ pub fn reverse_address(addr: Address) -> String {
 /// Returns the ENS namehash as specified in [EIP-137](https://eips.ethereum.org/EIPS/eip-137)
 pub fn namehash(name: &str) -> H256 {
     if name.is_empty() {
-        return H256::zero()
+        return H256::zero();
     }
 
     // Remove the variation selector U+FE0F

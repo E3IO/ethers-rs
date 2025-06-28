@@ -157,10 +157,7 @@ mod eth_tests {
 
         // Assert EIP-1559 fields
         assert_eq!(tx_from_node.max_fee_per_gas, Some(max_fee_per_gas));
-        assert_eq!(
-            tx_from_node.max_priority_fee_per_gas,
-            Some(max_priority_fee_per_gas)
-        );
+        assert_eq!(tx_from_node.max_priority_fee_per_gas, Some(max_priority_fee_per_gas));
         assert_eq!(tx_from_node.transaction_type, Some(2.into())); // EIP-1559 is type 2
     }
 }

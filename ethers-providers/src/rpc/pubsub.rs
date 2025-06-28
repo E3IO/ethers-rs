@@ -89,7 +89,7 @@ where
     fn poll_next(self: Pin<&mut Self>, ctx: &mut Context) -> Poll<Option<Self::Item>> {
         if !self.loaded_elements.is_empty() {
             let next_element = self.get_mut().loaded_elements.pop_front();
-            return Poll::Ready(next_element)
+            return Poll::Ready(next_element);
         }
 
         let mut this = self.project();
@@ -99,11 +99,11 @@ where
                     Ok(res) => Poll::Ready(Some(res)),
                     Err(err) => {
                         error!("failed to deserialize item {:?}", err);
-                        continue
+                        continue;
                     }
                 },
                 None => Poll::Ready(None),
-            }
+            };
         }
     }
 }

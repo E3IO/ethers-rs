@@ -50,7 +50,8 @@ pub use ethers_contract_derive::{
     abigen, Eip712, EthAbiCodec, EthAbiType, EthCall, EthDisplay, EthError, EthEvent,
 };
 
-// Hide the Lazy re-export, it's just for convenience
+// Re-export once_cell::Lazy for convenience in generated code
+// This is primarily used by the abigen macro and is not intended for direct use
 #[doc(hidden)]
 pub use once_cell::sync::Lazy;
 

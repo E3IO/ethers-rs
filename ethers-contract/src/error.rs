@@ -28,11 +28,11 @@ pub trait ContractRevert: AbiDecode + AbiEncode + Send + Sync {
     /// Decode the error from EVM revert data including an Error selector
     fn decode_with_selector(data: &[u8]) -> Option<Self> {
         if data.len() < 4 {
-            return None
+            return None;
         }
         let selector = data[..4].try_into().expect("checked by len");
         if !Self::valid_selector(selector) {
-            return None
+            return None;
         }
 
         if selector == String::selector() {
@@ -199,16 +199,16 @@ mod test {
                 if let Ok(decoded) =
                     <::std::string::String as ::ethers::core::abi::AbiDecode>::decode(data)
                 {
-                    return Ok(Self::RevertString(decoded))
+                    return Ok(Self::RevertString(decoded));
                 }
                 if let Ok(decoded) = <EmptyAddress as ::ethers::core::abi::AbiDecode>::decode(data)
                 {
-                    return Ok(Self::EmptyAddress(decoded))
+                    return Ok(Self::EmptyAddress(decoded));
                 }
                 if let Ok(decoded) =
                     <CollateralIsZero as ::ethers::core::abi::AbiDecode>::decode(data)
                 {
-                    return Ok(Self::CollateralIsZero(decoded))
+                    return Ok(Self::CollateralIsZero(decoded));
                 }
                 Err(::ethers::core::abi::Error::InvalidData.into())
             }

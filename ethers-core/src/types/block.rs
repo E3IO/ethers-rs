@@ -1,6 +1,6 @@
 // Modified from <https://github.com/tomusdrw/rust-web3/blob/master/src/types/block.rs>
 
-#[cfg(not(feature = "celo"))]
+#[cfg(not(has_celo))]
 use crate::types::Withdrawal;
 use crate::types::{Address, Bloom, Bytes, Transaction, TxHash, H256, U256, U64};
 use chrono::{DateTime, TimeZone, Utc};
@@ -24,7 +24,7 @@ pub struct Block<TX> {
     #[serde(default, rename = "parentHash")]
     pub parent_hash: H256,
     /// Hash of the uncles
-    #[cfg(not(feature = "celo"))]
+    #[cfg(not(has_celo))]
     #[serde(default, rename = "sha3Uncles")]
     pub uncles_hash: H256,
     /// Miner/author's address. None if pending.
@@ -45,7 +45,7 @@ pub struct Block<TX> {
     #[serde(default, rename = "gasUsed")]
     pub gas_used: U256,
     /// Gas Limit
-    #[cfg(not(feature = "celo"))]
+    #[cfg(not(has_celo))]
     #[serde(default, rename = "gasLimit")]
     pub gas_limit: U256,
     /// Extra data
@@ -58,7 +58,7 @@ pub struct Block<TX> {
     #[serde(default)]
     pub timestamp: U256,
     /// Difficulty
-    #[cfg(not(feature = "celo"))]
+    #[cfg(not(has_celo))]
     #[serde(default)]
     pub difficulty: U256,
     /// Total difficulty
@@ -68,7 +68,7 @@ pub struct Block<TX> {
     #[serde(default, rename = "sealFields", deserialize_with = "deserialize_null_default")]
     pub seal_fields: Vec<Bytes>,
     /// Uncles' hashes
-    #[cfg(not(feature = "celo"))]
+    #[cfg(not(has_celo))]
     #[serde(default)]
     pub uncles: Vec<H256>,
     /// Transactions
@@ -78,48 +78,48 @@ pub struct Block<TX> {
     pub size: Option<U256>,
     /// Mix Hash
     #[serde(rename = "mixHash")]
-    #[cfg(not(feature = "celo"))]
+    #[cfg(not(has_celo))]
     pub mix_hash: Option<H256>,
     /// Nonce
-    #[cfg(not(feature = "celo"))]
+    #[cfg(not(has_celo))]
     pub nonce: Option<crate::types::H64>,
     /// Base fee per unit of gas (if past London)
     #[serde(rename = "baseFeePerGas")]
     pub base_fee_per_gas: Option<U256>,
     /// Blob gas used (if past Cancun)
     #[serde(default, skip_serializing_if = "Option::is_none", rename = "blobGasUsed")]
-    #[cfg(not(feature = "celo"))]
+    #[cfg(not(has_celo))]
     pub blob_gas_used: Option<U256>,
     /// Excess blob gas (if past Cancun)
     #[serde(default, skip_serializing_if = "Option::is_none", rename = "excessBlobGas")]
-    #[cfg(not(feature = "celo"))]
+    #[cfg(not(has_celo))]
     pub excess_blob_gas: Option<U256>,
     /// Withdrawals root hash (if past Shanghai)
     #[serde(default, skip_serializing_if = "Option::is_none", rename = "withdrawalsRoot")]
-    #[cfg(not(feature = "celo"))]
+    #[cfg(not(has_celo))]
     pub withdrawals_root: Option<H256>,
     /// Withdrawals (if past Shanghai)
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[cfg(not(feature = "celo"))]
+    #[cfg(not(has_celo))]
     pub withdrawals: Option<Vec<Withdrawal>>,
     /// Parent beacon block root (if past Cancun)
     #[serde(default, skip_serializing_if = "Option::is_none", rename = "parentBeaconBlockRoot")]
-    #[cfg(not(feature = "celo"))]
+    #[cfg(not(has_celo))]
     pub parent_beacon_block_root: Option<H256>,
 
-    #[cfg(feature = "celo")]
+    #[cfg(has_celo)]
     #[cfg_attr(docsrs, doc(cfg(feature = "celo")))]
     /// The block's randomness
     pub randomness: Randomness,
 
     /// BLS signatures with a SNARK-friendly hash function
-    #[cfg(feature = "celo")]
+    #[cfg(has_celo)]
     #[cfg_attr(docsrs, doc(cfg(feature = "celo")))]
     #[serde(rename = "epochSnarkData", default)]
     pub epoch_snark_data: Option<EpochSnarkData>,
 
     /// Captures unknown fields such as additional fields used by L2s
-    #[cfg(not(feature = "celo"))]
+    #[cfg(not(has_celo))]
     #[serde(flatten)]
     pub other: crate::types::OtherFields,
 }
@@ -146,22 +146,22 @@ pub enum TimeError {
 }
 
 // ref <https://eips.ethereum.org/EIPS/eip-1559>
-#[cfg(not(feature = "celo"))]
+#[cfg(not(has_celo))]
 pub const ELASTICITY_MULTIPLIER: U256 = U256([2u64, 0, 0, 0]);
 // max base fee delta is 12.5%
-#[cfg(not(feature = "celo"))]
+#[cfg(not(has_celo))]
 pub const BASE_FEE_MAX_CHANGE_DENOMINATOR: U256 = U256([8u64, 0, 0, 0]);
 
 impl<TX> Block<TX> {
     /// The target gas usage as per EIP-1559
-    #[cfg(not(feature = "celo"))]
+    #[cfg(not(has_celo))]
     pub fn gas_target(&self) -> U256 {
         self.gas_limit / ELASTICITY_MULTIPLIER
     }
 
     /// The next block's base fee, it is a function of parent block's base fee and gas usage.
     /// Reference: <https://eips.ethereum.org/EIPS/eip-1559>
-    #[cfg(not(feature = "celo"))]
+    #[cfg(not(has_celo))]
     pub fn next_block_base_fee(&self) -> Option<U256> {
         use core::cmp::Ordering;
 
@@ -172,9 +172,9 @@ impl<TX> Block<TX> {
             Ordering::Greater => {
                 let gas_used_delta = self.gas_used - self.gas_target();
                 let base_fee_per_gas_delta = U256::max(
-                    base_fee_per_gas * gas_used_delta /
-                        target_usage /
-                        BASE_FEE_MAX_CHANGE_DENOMINATOR,
+                    base_fee_per_gas * gas_used_delta
+                        / target_usage
+                        / BASE_FEE_MAX_CHANGE_DENOMINATOR,
                     U256::from(1u32),
                 );
                 let expected_base_fee_per_gas = base_fee_per_gas + base_fee_per_gas_delta;
@@ -182,9 +182,9 @@ impl<TX> Block<TX> {
             }
             Ordering::Less => {
                 let gas_used_delta = self.gas_target() - self.gas_used;
-                let base_fee_per_gas_delta = base_fee_per_gas * gas_used_delta /
-                    target_usage /
-                    BASE_FEE_MAX_CHANGE_DENOMINATOR;
+                let base_fee_per_gas_delta = base_fee_per_gas * gas_used_delta
+                    / target_usage
+                    / BASE_FEE_MAX_CHANGE_DENOMINATOR;
                 let expected_base_fee_per_gas = base_fee_per_gas - base_fee_per_gas_delta;
                 Some(expected_base_fee_per_gas)
             }
@@ -201,10 +201,10 @@ impl<TX> Block<TX> {
     ///   [`DateTime<Utc>`].
     pub fn time(&self) -> Result<DateTime<Utc>, TimeError> {
         if self.timestamp.is_zero() {
-            return Err(TimeError::TimestampZero)
+            return Err(TimeError::TimestampZero);
         }
         if self.timestamp.bits() > 63 {
-            return Err(TimeError::TimestampOverflow)
+            return Err(TimeError::TimestampOverflow);
         }
         // Casting to i64 is safe because the timestamp is guaranteed to be less than 2^63.
         // TODO: It would be nice if there was `TryInto<i64> for U256`.
@@ -216,7 +216,7 @@ impl<TX> Block<TX> {
 impl Block<TxHash> {
     /// Converts this block that only holds transaction hashes into a full block with `Transaction`
     pub fn into_full_block(self, transactions: Vec<Transaction>) -> Block<Transaction> {
-        #[cfg(not(feature = "celo"))]
+        #[cfg(not(has_celo))]
         {
             let Block {
                 hash,
@@ -280,7 +280,7 @@ impl Block<TxHash> {
             }
         }
 
-        #[cfg(feature = "celo")]
+        #[cfg(has_celo)]
         {
             let Block {
                 hash,
@@ -329,7 +329,7 @@ impl Block<TxHash> {
 
 impl From<Block<Transaction>> for Block<TxHash> {
     fn from(full: Block<Transaction>) -> Self {
-        #[cfg(not(feature = "celo"))]
+        #[cfg(not(has_celo))]
         {
             let Block {
                 hash,
@@ -393,7 +393,7 @@ impl From<Block<Transaction>> for Block<TxHash> {
             }
         }
 
-        #[cfg(feature = "celo")]
+        #[cfg(has_celo)]
         {
             let Block {
                 hash,
@@ -443,7 +443,7 @@ impl From<Block<Transaction>> for Block<TxHash> {
 /// Commit-reveal data for generating randomness in the
 /// [Celo protocol](https://docs.celo.org/celo-codebase/protocol/identity/randomness)
 #[derive(Debug, Default, Clone, PartialEq, Eq, Deserialize, Serialize)]
-#[cfg(feature = "celo")]
+#[cfg(has_celo)]
 pub struct Randomness {
     /// The committed randomness for that block
     pub committed: Bytes,
@@ -453,7 +453,7 @@ pub struct Randomness {
 
 /// SNARK-friendly epoch block signature and bitmap
 #[derive(Debug, Default, Clone, PartialEq, Eq, Deserialize, Serialize)]
-#[cfg(feature = "celo")]
+#[cfg(has_celo)]
 pub struct EpochSnarkData {
     /// The bitmap showing which validators signed on the epoch block
     pub bitmap: Bytes,
@@ -544,13 +544,13 @@ impl<'de> Deserialize<'de> for BlockId {
                     match key.as_str() {
                         "blockNumber" => {
                             if number.is_some() || hash.is_some() {
-                                return Err(serde::de::Error::duplicate_field("blockNumber"))
+                                return Err(serde::de::Error::duplicate_field("blockNumber"));
                             }
                             number = Some(BlockId::Number(map.next_value::<BlockNumber>()?))
                         }
                         "blockHash" => {
                             if number.is_some() || hash.is_some() {
-                                return Err(serde::de::Error::duplicate_field("blockHash"))
+                                return Err(serde::de::Error::duplicate_field("blockHash"));
                             }
                             hash = Some(BlockId::Hash(map.next_value::<H256>()?))
                         }
@@ -708,7 +708,7 @@ impl fmt::Display for BlockNumber {
 }
 
 #[cfg(test)]
-#[cfg(not(feature = "celo"))]
+#[cfg(not(has_celo))]
 mod tests {
     use super::*;
     use crate::types::{Transaction, TxHash};

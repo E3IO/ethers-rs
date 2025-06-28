@@ -1,8 +1,26 @@
 #![doc = include_str!("../README.md")]
 #![allow(clippy::type_complexity)]
 #![warn(missing_docs)]
-#![deny(unsafe_code, rustdoc::broken_intra_doc_links)]
+#![deny(unsafe_code)]
+#![deny(rustdoc::broken_intra_doc_links)]
+#![cfg_attr(not(target_arch = "wasm32"), deny(unused_crate_dependencies))]
 #![cfg_attr(docsrs, feature(doc_cfg, doc_auto_cfg))]
+
+// 编译时检查互斥特性（测试时跳过）
+#[cfg(all(feature = "rustls", feature = "openssl", not(test)))]
+compile_error!("features 'rustls' and 'openssl' are mutually exclusive");
+
+#[cfg(all(feature = "ws", feature = "legacy-ws", not(test)))]
+compile_error!("features 'ws' and 'legacy-ws' are mutually exclusive");
+
+// 测试依赖（仅在测试时使用）
+#[cfg(test)]
+use tracing_test as _;
+
+// 避免未使用依赖警告
+#[cfg(not(target_arch = "wasm32"))]
+use bytes as _;
+use hashers as _;
 
 mod ext;
 pub use ext::*;

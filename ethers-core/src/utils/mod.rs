@@ -1,13 +1,13 @@
 /// Utilities for launching a ganache-cli testnet instance
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(native)]
 mod ganache;
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(native)]
 pub use ganache::{Ganache, GanacheInstance};
 
 /// Utilities for launching a go-ethereum dev-mode instance
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(native)]
 mod geth;
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(native)]
 pub use geth::{Geth, GethInstance};
 
 /// Utilities for working with a `genesis.json` and other chain config structs.
@@ -15,9 +15,9 @@ mod genesis;
 pub use genesis::{ChainConfig, CliqueConfig, EthashConfig, Genesis, GenesisAccount};
 
 /// Utilities for launching an anvil instance
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(native)]
 mod anvil;
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(native)]
 pub use anvil::{Anvil, AnvilInstance};
 
 /// Moonbeam utils
@@ -473,7 +473,7 @@ pub fn parse_checksummed(addr: &str, chain_id: Option<u8>) -> Result<Address, Co
 pub fn format_bytes32_string(text: &str) -> Result<[u8; 32], ConversionError> {
     let str_bytes: &[u8] = text.as_bytes();
     if str_bytes.len() > 32 {
-        return Err(ConversionError::TextTooLong)
+        return Err(ConversionError::TextTooLong);
     }
 
     let mut bytes32: [u8; 32] = [0u8; 32];
@@ -519,7 +519,7 @@ where
     D: Deserializer<'de>,
 {
     if bytes.0.len() > 32 {
-        return Err(serde::de::Error::custom("input too long to be a H256"))
+        return Err(serde::de::Error::custom("input too long to be a H256"));
     }
 
     // left pad with zeros to 32 bytes
@@ -557,10 +557,10 @@ fn estimate_priority_fee(rewards: Vec<Vec<U256>>) -> U256 {
     let mut rewards: Vec<U256> =
         rewards.iter().map(|r| r[0]).filter(|r| *r > U256::zero()).collect();
     if rewards.is_empty() {
-        return U256::zero()
+        return U256::zero();
     }
     if rewards.len() == 1 {
-        return rewards[0]
+        return rewards[0];
     }
     // Sort the rewards as we will eventually take the median.
     rewards.sort();
@@ -587,8 +587,8 @@ fn estimate_priority_fee(rewards: Vec<Vec<U256>>) -> U256 {
 
     // If we encountered a big change in fees at a certain position, then consider only
     // the values >= it.
-    let values = if *max_change >= EIP1559_FEE_ESTIMATION_THRESHOLD_MAX_CHANGE.into() &&
-        (max_change_index >= (rewards.len() / 2))
+    let values = if *max_change >= EIP1559_FEE_ESTIMATION_THRESHOLD_MAX_CHANGE.into()
+        && (max_change_index >= (rewards.len() / 2))
     {
         rewards[max_change_index..].to_vec()
     } else {
@@ -615,7 +615,7 @@ fn base_fee_surged(base_fee_per_gas: U256) -> U256 {
 ///
 /// Does not guarantee that the given port is unused after the function exists, just that it was
 /// unused before the function started (i.e., it does not reserve a port).
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(native)]
 pub(crate) fn unused_port() -> u16 {
     let listener = std::net::TcpListener::bind("127.0.0.1:0")
         .expect("Failed to create TCP listener to find unused port");
@@ -971,7 +971,7 @@ mod tests {
             (
                 Some(30),
                 "5aaeb6053f3e94c9b9a09f33669435e7ef1beaed",
-                "0x5aaEB6053f3e94c9b9a09f33669435E7ef1bEAeD",
+                "0x5aaEB6053f3e94c9b9A09f33669435E7ef1bEAeD",
             ),
             (
                 Some(30),

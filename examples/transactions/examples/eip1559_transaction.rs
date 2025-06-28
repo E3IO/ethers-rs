@@ -4,9 +4,10 @@
 // Rust compiler and compatible dependencies (e.g., those that work with icu4c version >=70).
 
 use ethers::prelude::*;
-use ethers_core::types::{Address, Eip1559TransactionRequest, U256};
-use std::str::FromStr;
+use ethers::types::{Address, Eip1559TransactionRequest, U256};
+use ethers::types::transaction::eip2718::TypedTransaction;
 use eyre::Result;
+use std::str::FromStr;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -34,7 +35,8 @@ async fn main() -> Result<()> {
     // Gas limit can often be estimated by the node, but can also be set explicitly.
 
     // Get current EIP-1559 fee data
-    let (current_max_fee_per_gas, current_max_priority_fee_per_gas) = provider.estimate_eip1559_fees(None).await?;
+    let (current_max_fee_per_gas, current_max_priority_fee_per_gas) =
+        provider.estimate_eip1559_fees(None).await?;
     println!("Estimated max_fee_per_gas: {} wei", current_max_fee_per_gas);
     println!("Estimated max_priority_fee_per_gas: {} wei", current_max_priority_fee_per_gas);
 
@@ -71,7 +73,10 @@ async fn main() -> Result<()> {
 
     // 7. Wait for the transaction receipt
     // `confirmations(1)` means wait for at least 1 block confirmation.
-    let receipt = pending_tx.confirmations(1).await?.ok_or_else(|| eyre::eyre!("Transaction receipt not found after 1 confirmation"))?;
+    let receipt = pending_tx
+        .confirmations(1)
+        .await?
+        .ok_or_else(|| eyre::eyre!("Transaction receipt not found after 1 confirmation"))?;
 
     println!("Transaction mined!");
     println!("  Transaction Hash: {:?}", receipt.transaction_hash);
